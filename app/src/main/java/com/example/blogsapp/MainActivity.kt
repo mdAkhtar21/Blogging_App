@@ -10,17 +10,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.blogsapp.presentation.blog_list.BlogListScreen
 import com.example.blogsapp.presentation.blog_list.BlogListViewModel
 import com.example.compose.BlogsAppTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val viewModel: BlogListViewModel = viewModel()
+            val viewModel = koinViewModel<BlogListViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             BlogsAppTheme {

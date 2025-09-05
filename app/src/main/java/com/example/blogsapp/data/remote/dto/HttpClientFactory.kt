@@ -14,13 +14,13 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class HttpClientFactory {
+object HttpClientFactory {
 
     fun create(engine: HttpClientEngine): HttpClient {
         return HttpClient(engine) {
             install(ContentNegotiation) {
                 json(
-                    Json { ignoreUnknownKeys = true },
+                    json = Json { ignoreUnknownKeys = true },
                     contentType= ContentType.Text.Plain
                 )
             }
@@ -37,4 +37,5 @@ class HttpClientFactory {
             }
         }
     }
+
 }

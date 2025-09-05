@@ -1,5 +1,7 @@
 package com.example.blogsapp.di
 
+import com.example.blogsapp.data.local.entity.BlogDatabase
+import com.example.blogsapp.data.local.entity.DatabaseFactory
 import com.example.blogsapp.data.remote.dto.HttpClientFactory
 import com.example.blogsapp.data.remote.dto.RemoteBlogDataSource
 import com.example.blogsapp.data.remote.dto.KtorRemoteBlogDataSource
@@ -14,6 +16,8 @@ import org.koin.dsl.module
 
 val koinMainModule = module {
 
+    single { DatabaseFactory.onCreate(get()) }
+    single { get<BlogDatabase>().blogDao() }
     single { HttpClientFactory.create(OkHttp.create()) }
 
     singleOf(::KtorRemoteBlogDataSource).bind<RemoteBlogDataSource>()

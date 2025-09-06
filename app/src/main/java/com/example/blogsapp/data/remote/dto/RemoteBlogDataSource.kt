@@ -1,7 +1,6 @@
 package com.example.blogsapp.data.remote.dto
 
-import com.example.blogsapp.domain.model.Blog
-
+import com.example.blogsapp.data.util.Result
 interface RemoteBlogDataSource {
-    suspend fun getAllBlogs():List<BlogDto>?
+    suspend fun getAllBlogs():Result<List<BlogDto>>
 }

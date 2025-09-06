@@ -9,8 +9,15 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.blogsapp.data.util.Result
+import com.example.blogsapp.presentation.blog_list.components.BlogListEvent
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 
-class BlogListViewModel(private val blogRepository: BlogRepository) : ViewModel() {
+
+class BlogListViewModel(
+    private val blogRepository: BlogRepository
+) : ViewModel() {
 
     private val _state = MutableStateFlow(BlogListState())
     val state = _state
@@ -19,20 +26,34 @@ class BlogListViewModel(private val blogRepository: BlogRepository) : ViewModel(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = _state.value
         )
-
-
     init {
         getAllBlogs()
     }
 
+    private val _event= Channel<BlogListEvent>()
+    val event=_event.receiveAsFlow()
+
     private fun getAllBlogs() {
         viewModelScope.launch {
-            val blog = blogRepository.getAllBlogs()
+            val result = blogRepository.getAllBlogs()
 
-            if (blog != null) {
-                _state.update {
-                    it.copy(blogs = blog)
-                }
+            when (result) {
+               is Result.Success->{
+                   _state.update {
+                       it.copy(blogs = result.data.orEmpty(),
+                           errorMessage = null)
+                   }
+               }
+               is Result.Error->{
+                   _state.update {
+                       it.copy(blogs = result.data.orEmpty(),
+                           errorMessage = result.message)
+                   }
+                   result.message?.let {
+                       _event.send(BlogListEvent.Error(it))
+                   }
+
+               }
             }
         }
     }

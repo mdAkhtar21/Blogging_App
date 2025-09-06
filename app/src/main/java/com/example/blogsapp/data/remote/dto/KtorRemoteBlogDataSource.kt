@@ -4,18 +4,26 @@ import com.example.blogsapp.data.util.Contant.GITHUB_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import com.example.blogsapp.data.util.Result
+import java.net.UnknownHostException
+
 
 class KtorRemoteBlogDataSource(
     private val httpClient:HttpClient
 ) :RemoteBlogDataSource{
 
-     override suspend fun getAllBlogs():List<BlogDto>?{
+     override suspend fun getAllBlogs():Result<List<BlogDto>>{
         return  try {
             val response=httpClient.get(urlString=GITHUB_URL)
-            response.body<List<BlogDto>>()
-        }catch (e:Exception){
+            val blogs=response.body<List<BlogDto>>()
+            Result.Success(blogs)
+        }catch (e:UnknownHostException){
             e.printStackTrace()
-            null
+            Result.Error(" Network Error Please verify your internet connection ${e.message}")
+        }
+        catch (e:Exception){
+            e.printStackTrace()
+            Result.Error("Something went wrong ${e.message}")
         }
     }
 }

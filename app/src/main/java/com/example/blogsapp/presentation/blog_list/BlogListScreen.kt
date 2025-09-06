@@ -1,11 +1,11 @@
 package com.example.blogsapp.presentation.blog_list
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -13,18 +13,35 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.blogsapp.domain.model.Blog
 import com.example.blogsapp.presentation.blog_list.components.BlogCard
+import com.example.blogsapp.presentation.blog_list.components.BlogListEvent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 
 @Composable
 fun BlogListScreen(
     modifier: Modifier = Modifier,
-    state: BlogListState
+    state: BlogListState,
+    event: Flow<BlogListEvent>
 ){
+    val context=LocalContext.current
+    LaunchedEffect(key1=Unit) {
+        event.collect{event->
+            when(event){
+                is BlogListEvent.Error->{
+                    Toast.makeText(context,event.error,Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     Column (
         modifier = modifier.fillMaxSize(),
     ){
@@ -72,5 +89,7 @@ private fun BlogListPreview() {
             content = ""
         )
     )
-    BlogListScreen(state = BlogListState(blogs = dummydata))
+    BlogListScreen(state = BlogListState(blogs = dummydata),
+        event = emptyFlow()
+    )
 }

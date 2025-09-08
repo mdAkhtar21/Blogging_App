@@ -5,4 +5,5 @@ import com.example.blogsapp.domain.model.Blog
 
 interface BlogRepository {
     suspend fun getAllBlogs():Result<List<Blog>>
+    suspend fun getBlogById(blogId:Int):Result<Blog>
 }

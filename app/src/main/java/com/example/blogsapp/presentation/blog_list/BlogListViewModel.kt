@@ -40,7 +40,7 @@ class BlogListViewModel(
             when (result) {
                is Result.Success->{
                    _state.update {
-                       it.copy(blogs = result.data.orEmpty(),
+                       it.copy(blogs = result.data.orEmpty().reversed(),
                            errorMessage = null)
                    }
                }

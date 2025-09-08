@@ -1,6 +1,8 @@
 package com.example.blogsapp.data.repository
 
 import com.example.blogsapp.data.local.BlogDao
+import com.example.blogsapp.data.local.entity.BlogContentEntity
+import com.example.blogsapp.data.mapper.toBlog
 import com.example.blogsapp.data.mapper.toBlogEntityList
 import com.example.blogsapp.data.mapper.toBlogList
 import com.example.blogsapp.data.remote.dto.KtorRemoteBlogDataSource
@@ -36,6 +38,31 @@ class BlogRepositoryImpl(
                         message = remoteBlogs.message
                             ?: "Failed to fetch in the data no cached data is avilable"
                     )
+                }
+            }
+        }
+    }
+
+    override suspend fun getBlogById(blogId: Int): Result<Blog> {
+        val blogEntity=localBlogDataSource.getBlogsById(blogId)
+            ?: return Result.Error("data is not found in the local database")
+        val contentResult=remoteBlogDataSource.fetchBlogContent(blogEntity.contentUrl)
+       return when(contentResult){
+            is Result.Error ->{
+                val blogContentEntity=BlogContentEntity(
+                    blogId=blogId,
+                    content=contentResult.data?:""
+                )
+                localBlogDataSource.insertblogContent(blogContentEntity)
+
+                Result.Success(data = blogEntity.toBlog((contentResult.data)))
+            }
+            is Result.Success ->{
+                val contentEntity=localBlogDataSource.getBlogContent(blogId);
+                if(contentEntity!=null){
+                    Result.Success(data = blogEntity.toBlog(contentEntity.content))
+                }else{
+                    Result.Error(message = "Failed to Fetch the blog content ${contentResult.message}")
                 }
             }
         }

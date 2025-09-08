@@ -1,6 +1,9 @@
 package com.example.blogsapp.presentation.blog_list
 
 import android.widget.Toast
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -29,7 +33,8 @@ import kotlinx.coroutines.flow.emptyFlow
 fun BlogListScreen(
     modifier: Modifier = Modifier,
     state: BlogListState,
-    event: Flow<BlogListEvent>
+    event: Flow<BlogListEvent>,
+    onBlogCardClick: (Int) -> Unit
 ){
     val context=LocalContext.current
     LaunchedEffect(key1=Unit) {
@@ -47,19 +52,19 @@ fun BlogListScreen(
     ){
         BlogListTopBar()
         LazyVerticalGrid(
-            columns =
-                GridCells.Adaptive(minSize = 300.dp),
+            columns = GridCells.Adaptive(minSize = 300.dp),
             contentPadding = PaddingValues(15.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
+        ){
             items(state.blogs) { blog ->
-                BlogCard(blog = blog)
+                BlogCard(
+                    modifier = Modifier
+                        .clickable { onBlogCardClick(blog.id) },
+                    blog = blog
+                )
             }
-
         }
-
-
     }
 }
 
@@ -90,6 +95,7 @@ private fun BlogListPreview() {
         )
     )
     BlogListScreen(state = BlogListState(blogs = dummydata),
-        event = emptyFlow()
+        event = emptyFlow(),
+        onBlogCardClick = {}
     )
 }

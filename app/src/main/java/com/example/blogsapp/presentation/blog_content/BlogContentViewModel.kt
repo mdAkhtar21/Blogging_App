@@ -51,10 +51,12 @@ class BlogContentViewModel(
                     }
                 }
                 is Result.Success -> {
+                    _state.update { it.copy(isLoading=true) }
                     _state.update {
                         it.copy(
                             errorMessage = null,
-                            blog = result.data
+                            blog = result.data,
+                            isLoading = false
                         )
                     }
                 }

@@ -1,9 +1,7 @@
 package com.example.blogsapp.presentation.blog_list
 
 import android.widget.Toast
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -28,6 +25,15 @@ import com.example.blogsapp.presentation.blog_list.components.BlogListEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
+// Import the correct clickable modifier
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.rememberRipple // Import rememberRipple
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.draw.clip
+import com.example.blogsapp.presentation.Common_Screen.ShimmerEffect
 
 @Composable
 fun BlogListScreen(
@@ -57,12 +63,25 @@ fun BlogListScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp)
         ){
-            items(state.blogs) { blog ->
-                BlogCard(
-                    modifier = Modifier
-                        .clickable { onBlogCardClick(blog.id) },
-                    blog = blog
-                )
+            if(state.isLoading){
+                items(count = 3){
+                    ShimmerEffect(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .fillMaxWidth()
+                            .height(250.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                    )
+                }
+            }
+            else{
+                items(state.blogs) { blog ->
+                    BlogCard(
+                        modifier = Modifier
+                            .clickable{ onBlogCardClick(blog.id) },
+                        blog = blog
+                    )
+                }
             }
         }
     }

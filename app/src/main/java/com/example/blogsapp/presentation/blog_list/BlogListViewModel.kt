@@ -39,15 +39,20 @@ class BlogListViewModel(
 
             when (result) {
                is Result.Success->{
+                   _state.update { it.copy(isLoading=true) }
                    _state.update {
                        it.copy(blogs = result.data.orEmpty().reversed(),
-                           errorMessage = null)
+                           errorMessage = null,
+                           isLoading = false
+                       )
                    }
                }
                is Result.Error->{
                    _state.update {
                        it.copy(blogs = result.data.orEmpty(),
-                           errorMessage = result.message)
+                           errorMessage = result.message,
+                           isLoading = false
+                       )
                    }
                    result.message?.let {
                        _event.send(BlogListEvent.Error(it))

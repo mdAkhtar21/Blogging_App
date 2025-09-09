@@ -1,14 +1,19 @@
 package com.example.blogsapp.presentation.blog_content
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -24,10 +29,14 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.blogsapp.presentation.Common_Screen.ShimmerEffect
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,6 +58,11 @@ fun BlogContentScreen(
             onBackClick = onBackClick,
             title = state.blog?.title
         )
+        if(state.isLoading){
+            LoadingContent(
+                modifier = Modifier.fillMaxSize()
+            )
+        }
         when{
             state.errorMessage!=null->{
                 ErrorContent(
@@ -142,4 +156,65 @@ private fun ErrorContent(
             textAlign = TextAlign.Center
         )
     }
+}
+
+@Composable
+private fun LoadingContent(
+    modifier: Modifier = Modifier,
+    shimmerBackgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            ShimmerEffect(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(shimmerBackgroundColor)
+            )
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                ShimmerEffect(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .fillMaxWidth()
+                        .height(20.dp)
+                        .background(shimmerBackgroundColor)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                ShimmerEffect(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .fillMaxWidth(fraction = 0.5f)
+                        .height(20.dp)
+                        .background(shimmerBackgroundColor)
+                )
+            }
+        }
+        repeat(times = 15) {
+            ShimmerEffect(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .padding(10.dp)
+                    .fillMaxWidth()
+                    .height(30.dp)
+                    .background(shimmerBackgroundColor)
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewLoadingContent() {
+    LoadingContent()
 }

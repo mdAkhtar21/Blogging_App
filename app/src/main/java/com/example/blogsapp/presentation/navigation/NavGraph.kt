@@ -28,6 +28,7 @@ fun NavGraph(
             val viewModel = koinViewModel<BlogListViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
             BlogListScreen(
+                modifier = modifier,
                 state = state,
                 event = viewModel.event,
                 onBlogCardClick = { id ->

@@ -21,7 +21,7 @@ object HttpClientFactory {
             install(ContentNegotiation) {
                 json(
                     json = Json { ignoreUnknownKeys = true },
-                    contentType= ContentType.Text.Plain
+                    contentType = ContentType.Text.Plain
                 )
             }
             install(HttpTimeout) {

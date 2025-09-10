@@ -19,16 +19,16 @@ class BlogContentViewModel(
     private val blogRepository: BlogRepository
 ): ViewModel() {
 
-    val blogId = savedStateHandle.toRoute<Route.BlogContentScreen>().blogId
+   private val blogId = savedStateHandle.toRoute<Route.BlogContentScreen>().blogId
 
-    private val _state= MutableStateFlow(BlogContentState());
+    private val _state= MutableStateFlow(BlogContentState())
     val state=_state
         .onStart{
             getBlogById()
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5000L),
             initialValue = _state.value
         )
 
@@ -41,17 +41,9 @@ class BlogContentViewModel(
     private fun getBlogById(){
         viewModelScope.launch {
             val result=blogRepository.getBlogById(blogId)
+            _state.update { it.copy(isLoading=true) }
             when(result){
-                is Result.Error -> {
-                    _state.update {
-                        it.copy(
-                            errorMessage = result.message,
-                            blog = result.data
-                        )
-                    }
-                }
                 is Result.Success -> {
-                    _state.update { it.copy(isLoading=true) }
                     _state.update {
                         it.copy(
                             errorMessage = null,
@@ -60,6 +52,16 @@ class BlogContentViewModel(
                         )
                     }
                 }
+                is Result.Error -> {
+                    _state.update {
+                        it.copy(
+                            errorMessage = result.message,
+                            blog = result.data,
+                            isLoading = false
+                        )
+                    }
+                }
+
             }
 
         }

@@ -18,13 +18,11 @@ class KtorRemoteBlogDataSource(
             val response=httpClient.get(urlString=GITHUB_URL)
             val blogs=response.body<List<BlogDto>>()
             Result.Success(blogs)
-        }catch (e:UnknownHostException){
+        }catch (e: UnknownHostException) {
+            Result.Error(message = "Network error. Please verify your internet connection.")
+        } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(" Network Error Please verify your internet connection ${e.message}")
-        }
-        catch (e:Exception){
-            e.printStackTrace()
-            Result.Error("Something went wrong ${e.message}")
+            Result.Error(message = "Something went wrong. ${e.message}")
         }
     }
 
@@ -33,13 +31,11 @@ class KtorRemoteBlogDataSource(
             val response=httpClient.get(urlString=url)
             val blogsContent=response.bodyAsText()
             Result.Success(blogsContent)
-        }catch (e:UnknownHostException){
+        } catch (e: UnknownHostException) {
+            Result.Error(message = "Network error. Please verify your internet connection.")
+        } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(" Network Error Please verify your internet connection ${e.message}")
-        }
-        catch (e:Exception){
-            e.printStackTrace()
-            Result.Error("Something went wrong ${e.message}")
+            Result.Error(message = "Something went wrong. ${e.message}")
         }
     }
 }

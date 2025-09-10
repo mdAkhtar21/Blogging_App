@@ -64,8 +64,8 @@ fun BlogCardImage(
             model = imageRequest,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = R.drawable.ic_launcher_background),
-            error = painterResource(id = R.drawable.ic_launcher_background),
+            placeholder = painterResource(id = R.drawable.img_placeholder),
+            error = painterResource(id = R.drawable.img_placeholder),
         )
     }
 }

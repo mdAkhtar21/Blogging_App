@@ -5,13 +5,13 @@ import com.example.blogsapp.data.local.entity.BlogContentEntity
 import com.example.blogsapp.data.mapper.toBlog
 import com.example.blogsapp.data.mapper.toBlogEntityList
 import com.example.blogsapp.data.mapper.toBlogList
-import com.example.blogsapp.data.remote.dto.KtorRemoteBlogDataSource
+import com.example.blogsapp.data.remote.dto.RemoteBlogDataSource
 import com.example.blogsapp.data.util.Result
 import com.example.blogsapp.domain.model.Blog
 import com.example.blogsapp.domain.repository.BlogRepository
 
 class BlogRepositoryImpl(
-    private val remoteBlogDataSource: KtorRemoteBlogDataSource,
+    private val remoteBlogDataSource: RemoteBlogDataSource,
     private val localBlogDataSource:BlogDao
 ):BlogRepository {
 
@@ -23,7 +23,7 @@ class BlogRepositoryImpl(
                     localBlogDataSource.deleteAllBlogs()
                     localBlogDataSource.insertBlogs(blogs.toBlogEntityList())
                     Result.Success(data = blogs.toBlogList())
-                } ?: Result.Error("data is not found");
+                } ?: Result.Error(message = "data is not found");
 
             }
             is Result.Error -> {
@@ -45,10 +45,10 @@ class BlogRepositoryImpl(
 
     override suspend fun getBlogById(blogId: Int): Result<Blog> {
         val blogEntity=localBlogDataSource.getBlogsById(blogId)
-            ?: return Result.Error("data is not found in the local database")
+            ?: return Result.Error(message = "Blog not found in local database.")
         val contentResult=remoteBlogDataSource.fetchBlogContent(blogEntity.contentUrl)
        return when(contentResult){
-            is Result.Error ->{
+            is Result.Success ->{
                 val blogContentEntity=BlogContentEntity(
                     blogId=blogId,
                     content=contentResult.data?:""
@@ -57,7 +57,7 @@ class BlogRepositoryImpl(
 
                 Result.Success(data = blogEntity.toBlog((contentResult.data)))
             }
-            is Result.Success ->{
+            is Result.Error ->{
                 val contentEntity=localBlogDataSource.getBlogContent(blogId);
                 if(contentEntity!=null){
                     Result.Success(data = blogEntity.toBlog(contentEntity.content))
